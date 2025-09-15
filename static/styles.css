@@ -1,0 +1,302 @@
+/* ---------- Apple-like Base ---------- */
+:root {
+  --bg: #f5f5f7;           /* Apple marketing gray */
+  --elevated: #ffffff;
+  --text: #1d1d1f;         /* Apple near-black */
+  --muted: #6e6e73;
+  --border: #d2d2d7;
+  --focus: #0071e3;        /* Apple blue */
+  --link: #0066cc;         /* System link blue */
+  --shadow: 0 6px 24px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+  --radius-xl: 16px;
+  --radius-lg: 12px;
+  --radius-md: 10px;
+  --radius-sm: 8px;
+  --pad-1: 8px;
+  --pad-2: 12px;
+  --pad-3: 16px;
+  --pad-4: 20px;
+  --pad-5: 28px;
+  --maxw: 960px;
+  --btn-height: 44px;
+  --transition: 180ms cubic-bezier(.2,.8,.2,1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --elevated: #111113;
+    --text: #f5f5f7;
+    --muted: #98989d;
+    --border: #2b2b2f;
+    --shadow: 0 10px 30px rgba(0,0,0,0.6);
+    --link: #7ab4ff;
+  }
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img, svg, video { max-width: 100%; display: block; }
+
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ---------- Layout ---------- */
+.page {
+  min-height: 100dvh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(24px, 3vw, 48px) 16px;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--maxw);
+  background: var(--elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow);
+  padding: clamp(20px, 3vw, 40px);
+}
+
+.header {
+  margin-bottom: 16px;
+}
+
+.title {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-size: clamp(22px, 3.6vw, 32px);
+  line-height: 1.15;
+  margin: 0 0 6px;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0 0 16px;
+}
+
+/* ---------- Forms ---------- */
+.form {
+  display: grid;
+  gap: 18px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+label {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.input,
+.textarea,
+input[type="file"] {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--elevated);
+  color: var(--text);
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.input,
+input[type="text"],
+input[type="file"] {
+  height: var(--btn-height);
+  padding: 0 var(--pad-3);
+  font-size: 15px;
+}
+
+.textarea,
+textarea {
+  padding: var(--pad-3);
+  min-height: 220px;
+  resize: vertical;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.input:hover,
+.textarea:hover,
+input[type="file"]:hover {
+  border-color: color-mix(in oklab, var(--border), var(--text) 22%);
+}
+
+.input:focus-visible,
+.textarea:focus-visible,
+input[type="file"]:focus-visible {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--focus), transparent 75%);
+}
+
+.helper {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ---------- Buttons ---------- */
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.btn {
+  position: relative;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--btn-height);
+  padding: 0 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--elevated);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition), background var(--transition);
+  user-select: none;
+  text-decoration: none;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+.btn:active { transform: translateY(0); }
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--focus), transparent 70%);
+  border-color: var(--focus);
+}
+
+.btn-primary {
+  background: var(--focus);
+  border-color: var(--focus);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 10px 24px rgba(0, 113, 227, 0.24);
+}
+
+.btn-ghost {
+  background: transparent;
+}
+
+/* ---------- Cards / Sections ---------- */
+.section {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: clamp(14px, 2vw, 20px);
+  background: var(--elevated);
+}
+
+.section + .section { margin-top: 16px; }
+
+/* ---------- Messages ---------- */
+.error,
+.notice,
+.success {
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  font-size: 14px;
+  border: 1px solid;
+}
+
+.error {
+  border-color: color-mix(in oklab, #ff3b30, transparent 50%);
+  background: color-mix(in oklab, #ff3b30, transparent 92%);
+  color: color-mix(in oklab, #ff3b30, black 15%);
+}
+
+.notice {
+  border-color: color-mix(in oklab, #ffcc00, transparent 50%);
+  background: color-mix(in oklab, #ffcc00, transparent 92%);
+  color: color-mix(in oklab, #ff9500, black 10%);
+}
+
+.success {
+  border-color: color-mix(in oklab, #34c759, transparent 50%);
+  background: color-mix(in oklab, #34c759, transparent 92%);
+  color: color-mix(in oklab, #34c759, black 10%);
+}
+
+/* ---------- Result page specifics ---------- */
+.output-wrap {
+  display: grid;
+  gap: 24px;
+}
+
+.output-block {
+  display: grid;
+  gap: 10px;
+}
+
+.output-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.output-area {
+  width: 100%;
+  min-height: 360px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  padding: var(--pad-3);
+  background: var(--elevated);
+  color: var(--text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow: auto;
+}
+
+.download-form {
+  display: inline-flex;
+  gap: 10px;
+}
+
+.download-form .btn { height: 38px; padding: 0 14px; }
+
+/* ---------- Footer / Links ---------- */
+.footer {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.footer a { color: var(--link); }
+
+/* ---------- Small screens ---------- */
+@media (max-width: 640px) {
+  .actions { width: 100%; }
+  .btn { flex: 1 1 auto; }
+  .output-area { min-height: 300px; }
+}
