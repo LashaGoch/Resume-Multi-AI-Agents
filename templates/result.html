@@ -1,23 +1,44 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
+  <meta charset="utf-8" />
   <title>Results</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-<body>
-  <h2>Tailored Resume</h2>
-  <form method="POST" action="/download">
-    <textarea name="content" rows="20" cols="100">{{ tailored_resume }}</textarea>
-    <input type="hidden" name="filename" value="tailored_resume.txt">
-    <br>
-    <button type="submit">Download Resume</button>
-  </form>
+<body class="page">
+  <main class="container">
+    <header class="header">
+      <h1 class="title">Results</h1>
+      <p class="subtitle">Download and review your tailored resume and cover letter.</p>
+    </header>
 
-  <h2>Cover Letter</h2>
-  <form method="POST" action="/download">
-    <textarea name="content" rows="20" cols="100">{{ cover_letter }}</textarea>
-    <input type="hidden" name="filename" value="cover_letter.txt">
-    <br>
-    <button type="submit">Download Cover Letter</button>
-  </form>
+    <div class="output-wrap">
+      <section class="section output-block">
+        <h2 class="output-title">Tailored Resume</h2>
+        <div class="output-area">{{ tailored_resume }}</div>
+
+        <form class="download-form" method="POST" action="/download-docx">
+          <textarea name="content" hidden>{{ tailored_resume }}</textarea>
+          <input type="hidden" name="filename" value="tailored_resume.docx">
+          <input type="hidden" name="title" value="Tailored Resume">
+          <button class="btn btn-primary" type="submit">Download Resume (.docx)</button>
+        </form>
+      </section>
+
+      <section class="section output-block">
+        <h2 class="output-title">Cover Letter</h2>
+        <div class="output-area">{{ cover_letter }}</div>
+
+        <form class="download-form" method="POST" action="/download-docx">
+          <textarea name="content" hidden>{{ cover_letter }}</textarea>
+          <input type="hidden" name="filename" value="cover_letter.docx">
+          <input type="hidden" name="title" value="Cover Letter">
+          <button class="btn btn-primary" type="submit">Download Cover Letter (.docx)</button>
+        </form>
+      </section>
+
+      <p class="footer"><a href="/">← Start over</a></p>
+    </div>
+  </main>
 </body>
 </html>
