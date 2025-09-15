@@ -1,8 +1,8 @@
 import os
 from flask import Flask, render_template, request, send_file
-from crewai import Crew, Task
+from crewai import Crew, Task, Process
 from agents import create_agents
-from utils import extract_resume_text, extract_job_description
+from utils import extract_resume_text  # ⬅️ drop extract_job_description
 from io import BytesIO
 
 app = Flask(__name__)
@@ -12,12 +12,20 @@ resume_agent, job_agent, tailor_agent, cover_letter_agent = create_agents()
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        resume_file = request.files["resume"]
-        job_url = request.form["job_url"]
+        resume_file = request.files.get("resume")
+        job_text = (request.form.get("job_text") or "").strip()
+
+        # Basic validation
+        if not resume_file or not job_text:
+            return render_template(
+                "index.html",
+                error="Please upload a resume and paste the job description.",
+                job_text=job_text or ""
+            )
 
         # Extract + lightly truncate to avoid OOM/token bloat on Render
         resume_text = (extract_resume_text(resume_file) or "")[:8000]
-        job_text = (extract_job_description(job_url) or "")[:6000]
+        job_text = job_text[:6000]
 
         # Define tasks
         parsed_resume = Task(
@@ -44,13 +52,13 @@ def index():
         # Create Crew and run all tasks
         crew = Crew(
             agents=[resume_agent, job_agent, tailor_agent, cover_letter_agent],
-            tasks=[parsed_resume, job_info, tailored_resume, cover_letter]
+            tasks=[parsed_resume, job_info, tailored_resume, cover_letter],
+            process=Process.sequential
         )
 
         try:
             results = crew.kickoff()  # returns CrewOutput
         except Exception as e:
-            # Optional: log e, show friendly error
             return render_template(
                 "result.html",
                 tailored_resume=f"Error running agents: {e}",
@@ -74,19 +82,5 @@ def index():
             cover_letter=cover_letter_output
         )
 
-    return render_template("index.html")
-
-
-@app.route("/download", methods=["POST"])
-def download():
-    text = request.form["content"]
-    filename = request.form["filename"]
-
-    buffer = BytesIO()
-    buffer.write(text.encode("utf-8"))
-    buffer.seek(0)
-
-    return send_file(buffer, as_attachment=True, download_name=filename, mimetype="text/plain")
-
-if __name__ == "__main__":
-    app.run(debug=True)
+    # GET
+    return render_template("index.html", error=None, job_text="")
