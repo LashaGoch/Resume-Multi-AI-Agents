@@ -15,9 +15,9 @@ def index():
         resume_file = request.files["resume"]
         job_url = request.form["job_url"]
 
-        # Extract resume + job ad text
-        resume_text = extract_resume_text(resume_file)
-        job_text = extract_job_description(job_url)
+        # Extract + lightly truncate to avoid OOM/token bloat on Render
+        resume_text = (extract_resume_text(resume_file) or "")[:8000]
+        job_text = (extract_job_description(job_url) or "")[:6000]
 
         # Define tasks
         parsed_resume = Task(
@@ -25,19 +25,16 @@ def index():
             description=f"Parse this resume:\n{resume_text}",
             expected_output="A structured text version of the resume with key sections (Experience, Education, Skills)."
         )
-
         job_info = Task(
             agent=job_agent,
             description=f"Extract job requirements:\n{job_text}",
             expected_output="A summary of the key qualifications, skills, and responsibilities required for the job."
         )
-
         tailored_resume = Task(
             agent=tailor_agent,
             description=f"Adjust the following resume:\n{resume_text}\n\nfor this job:\n{job_text}",
             expected_output="A tailored resume in plain text, aligned with the job requirements."
         )
-
         cover_letter = Task(
             agent=cover_letter_agent,
             description=f"Write a cover letter based on resume:\n{resume_text}\n\nand job:\n{job_text}",
@@ -50,12 +47,26 @@ def index():
             tasks=[parsed_resume, job_info, tailored_resume, cover_letter]
         )
 
-        results = crew.kickoff()  # runs all tasks
+        try:
+            results = crew.kickoff()  # returns CrewOutput
+        except Exception as e:
+            # Optional: log e, show friendly error
+            return render_template(
+                "result.html",
+                tailored_resume=f"Error running agents: {e}",
+                cover_letter="Could not generate cover letter due to an error."
+            )
 
-        # Depending on CrewAI version, results may be a list or dict
-        # Try list-style access first:
-        tailored_resume_output = results[2].raw if hasattr(results[2], "raw") else str(results[2])
-        cover_letter_output = results[3].raw if hasattr(results[3], "raw") else str(results[3])
+        task_outputs = getattr(results, "tasks_output", [])
+
+        def pick(i, fallback=""):
+            if i < len(task_outputs):
+                obj = task_outputs[i]
+                return getattr(obj, "raw", getattr(obj, "output", str(obj)))
+            return fallback
+
+        tailored_resume_output = pick(2, "Could not produce tailored resume.")
+        cover_letter_output = pick(3, "Could not produce cover letter.")
 
         return render_template(
             "result.html",
