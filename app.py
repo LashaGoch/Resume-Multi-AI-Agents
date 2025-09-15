@@ -24,12 +24,29 @@ def index():
         )
 
         # Define tasks
-        parsed_resume = Task(agent=resume_agent, description=f"Parse this resume:\n{resume_text}")
-        job_info = Task(agent=job_agent, description=f"Extract job requirements:\n{job_text}")
-        tailored_resume = Task(agent=tailor_agent,
-                               description=f"Adjust the following resume:\n{resume_text}\n\nfor this job:\n{job_text}")
-        cover_letter = Task(agent=cover_letter_agent,
-                            description=f"Write a cover letter based on resume:\n{resume_text}\n\nand job:\n{job_text}")
+        parsed_resume = Task(
+            agent=resume_agent,
+            description=f"Parse this resume:\n{resume_text}",
+            expected_output="A structured text version of the resume with key sections (Experience, Education, Skills)."
+        )
+
+        job_info = Task(
+            agent=job_agent,
+            description=f"Extract job requirements:\n{job_text}",
+            expected_output="A summary of the key qualifications, skills, and responsibilities required for the job."
+        )
+
+        tailored_resume = Task(
+            agent=tailor_agent,
+            description=f"Adjust the following resume:\n{resume_text}\n\nfor this job:\n{job_text}",
+            expected_output="A tailored resume in plain text, aligned with the job requirements."
+        )
+
+        cover_letter = Task(
+            agent=cover_letter_agent,
+            description=f"Write a cover letter based on resume:\n{resume_text}\n\nand job:\n{job_text}",
+            expected_output="A professional and personalized cover letter in plain text."
+        )
 
         results = crew.run([parsed_resume, job_info, tailored_resume, cover_letter])
 
