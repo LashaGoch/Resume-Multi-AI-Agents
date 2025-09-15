@@ -15,13 +15,9 @@ def index():
         resume_file = request.files["resume"]
         job_url = request.form["job_url"]
 
+        # Extract resume + job ad text
         resume_text = extract_resume_text(resume_file)
         job_text = extract_job_description(job_url)
-
-        # Create Crew workflow
-        crew = Crew(
-            agents=[resume_agent, job_agent, tailor_agent, cover_letter_agent]
-        )
 
         # Define tasks
         parsed_resume = Task(
@@ -48,13 +44,27 @@ def index():
             expected_output="A professional and personalized cover letter in plain text."
         )
 
-        results = crew.run([parsed_resume, job_info, tailored_resume, cover_letter])
+        # Create Crew and run all tasks
+        crew = Crew(
+            agents=[resume_agent, job_agent, tailor_agent, cover_letter_agent],
+            tasks=[parsed_resume, job_info, tailored_resume, cover_letter]
+        )
 
-        return render_template("result.html",
-                               tailored_resume=results[2].output,
-                               cover_letter=results[3].output)
+        results = crew.kickoff()  # runs all tasks
+
+        # Depending on CrewAI version, results may be a list or dict
+        # Try list-style access first:
+        tailored_resume_output = results[2].raw if hasattr(results[2], "raw") else str(results[2])
+        cover_letter_output = results[3].raw if hasattr(results[3], "raw") else str(results[3])
+
+        return render_template(
+            "result.html",
+            tailored_resume=tailored_resume_output,
+            cover_letter=cover_letter_output
+        )
 
     return render_template("index.html")
+
 
 @app.route("/download", methods=["POST"])
 def download():
