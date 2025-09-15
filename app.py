@@ -45,8 +45,12 @@ def index():
         )
         cover_letter = Task(
             agent=cover_letter_agent,
-            description=f"Write a cover letter based on resume:\n{resume_text}\n\nand job:\n{job_text}",
-            expected_output="A professional and personalized cover letter in plain text."
+            description=(
+                f"Write a cover letter based on resume:\n{resume_text}\n\nand job:\n{job_text}"
+                f"Mention company name if available in the job description."
+                f"\n\nMake it 3-4 paragraphs, professional, concise, and personalized."
+            ),
+            expected_output="A professional and personalized cover letter in plain text. "
         )
 
         # Create Crew and run all tasks
