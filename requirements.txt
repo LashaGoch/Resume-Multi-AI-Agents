@@ -1,0 +1,7 @@
+flask
+crewai
+openai
+requests
+beautifulsoup4
+python-docx
+PyPDF2
