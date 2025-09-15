@@ -1,8 +1,10 @@
 flask
 crewai
 openai
+litellm
+python-dotenv
 requests
 beautifulsoup4
-python-docx
 PyPDF2
+python-docx
 gunicorn
