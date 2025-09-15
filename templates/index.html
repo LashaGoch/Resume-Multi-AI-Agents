@@ -1,32 +1,38 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
   <meta charset="utf-8" />
   <title>AI Resume Tailor</title>
-  <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 16px; }
-    label { display: block; margin: 14px 0 6px; font-weight: 600; }
-    textarea, input[type="text"] { width: 100%; }
-    textarea { min-height: 220px; }
-    .error { background:#ffeaea; color:#a40000; border:1px solid #f3b1b1; padding:10px 12px; border-radius:6px; margin-bottom:16px; }
-    button { margin-top: 18px; padding: 10px 16px; border-radius: 6px; border: 1px solid #ccc; cursor: pointer; }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-<body>
-  <h1>AI Resume Tailor</h1>
+<body class="page">
+  <main class="container">
+    <header class="header">
+      <h1 class="title">AI Resume Tailor</h1>
+      <p class="subtitle">Upload your resume and paste the job description.</p>
+    </header>
 
-  {% if error %}
-    <div class="error">{{ error }}</div>
-  {% endif %}
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
 
-  <form method="POST" enctype="multipart/form-data">
-    <label>Resume File (.pdf / .docx / .txt)</label>
-    <input type="file" name="resume" accept=".pdf,.docx,.txt" required />
+    <form class="form" method="POST" enctype="multipart/form-data">
+      <div class="field">
+        <label>Resume File (.pdf / .docx / .txt)</label>
+        <input class="input" type="file" name="resume" accept=".pdf,.docx,.txt" required>
+        <div class="helper">We don’t store files. Parsing happens in-memory.</div>
+      </div>
 
-    <label>Job Description (paste full text)</label>
-    <textarea name="job_text" placeholder="Paste the entire job description here..." required>{{ job_text }}</textarea>
+      <div class="field">
+        <label>Job Description (paste full text)</label>
+        <textarea class="textarea" name="job_text" required>{{ job_text }}</textarea>
+      </div>
 
-    <button type="submit">Generate Tailored Resume + Cover Letter</button>
-  </form>
+      <div class="actions">
+        <button class="btn btn-primary" type="submit">Generate Tailored Resume + Cover Letter</button>
+        <a class="btn btn-ghost" href="/">Reset</a>
+      </div>
+    </form>
+  </main>
 </body>
 </html>
