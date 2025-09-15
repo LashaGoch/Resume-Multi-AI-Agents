@@ -1,13 +1,46 @@
 import os
+from io import BytesIO
+
 from flask import Flask, render_template, request, send_file
-from crewai import Crew, Task, Process
+from crewai import Crew, Task, Agent
+try:
+    from crewai import Process
+except ImportError:
+    from crewai.process import Process
 from agents import create_agents
 from utils import extract_resume_text  # ⬅️ drop extract_job_description
 from io import BytesIO
+from docx import Document
+from docx.shared import Pt, Inches
 
 app = Flask(__name__)
 
+app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
+
 resume_agent, job_agent, tailor_agent, cover_letter_agent = create_agents()
+
+def build_docx_bytes(title: str, content: str) -> BytesIO:
+    """Create a nicely formatted .docx in memory."""
+    doc = Document()
+    for section in doc.sections:
+        section.top_margin = Inches(0.7)
+        section.bottom_margin = Inches(0.7)
+        section.left_margin = Inches(0.7)
+        section.right_margin = Inches(0.7)
+
+    # Title
+    run = doc.add_paragraph().add_run(title or "Document")
+    run.bold = True
+    run.font.size = Pt(14)
+
+    # Body (preserve line breaks)
+    for line in (content or "").splitlines():
+        doc.add_paragraph(line)
+
+    bio = BytesIO()
+    doc.save(bio)
+    bio.seek(0)
+    return bio
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -86,5 +119,25 @@ def index():
             cover_letter=cover_letter_output
         )
 
+
+
     # GET
     return render_template("index.html", error=None, job_text="")
+
+
+@app.route("/download-docx", methods=["POST"])
+def download_docx():
+    content = request.form.get("content", "")
+    filename = (request.form.get("filename") or "document.docx").strip()
+    title = request.form.get("title", "")
+
+    if not filename.lower().endswith(".docx"):
+        filename += ".docx"
+
+    fileobj = build_docx_bytes(title, content)
+    return send_file(
+        fileobj,
+        as_attachment=True,
+        download_name=filename,
+        mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    )
