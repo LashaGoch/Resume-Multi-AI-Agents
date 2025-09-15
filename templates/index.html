@@ -1,15 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8" />
   <title>AI Resume Tailor</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 16px; }
+    label { display: block; margin: 14px 0 6px; font-weight: 600; }
+    textarea, input[type="text"] { width: 100%; }
+    textarea { min-height: 220px; }
+    .error { background:#ffeaea; color:#a40000; border:1px solid #f3b1b1; padding:10px 12px; border-radius:6px; margin-bottom:16px; }
+    button { margin-top: 18px; padding: 10px 16px; border-radius: 6px; border: 1px solid #ccc; cursor: pointer; }
+  </style>
 </head>
 <body>
-  <h2>Upload Resume & Job Link</h2>
+  <h1>AI Resume Tailor</h1>
+
+  {% if error %}
+    <div class="error">{{ error }}</div>
+  {% endif %}
+
   <form method="POST" enctype="multipart/form-data">
-    <label>Resume File:</label>
-    <input type="file" name="resume" required><br><br>
-    <label>LinkedIn Job URL:</label>
-    <input type="text" name="job_url" required><br><br>
+    <label>Resume File (.pdf / .docx / .txt)</label>
+    <input type="file" name="resume" accept=".pdf,.docx,.txt" required />
+
+    <label>Job Description (paste full text)</label>
+    <textarea name="job_text" placeholder="Paste the entire job description here..." required>{{ job_text }}</textarea>
+
     <button type="submit">Generate Tailored Resume + Cover Letter</button>
   </form>
 </body>
